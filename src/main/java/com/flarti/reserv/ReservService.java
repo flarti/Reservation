@@ -35,15 +35,6 @@ public class ReservService {
                     LocalDate.now(),
                     LocalDate.now().plusDays(5),
                     ReservationStatus.APPROVED
-            ),
-
-            4L, new Reservation(
-                    4L,
-                    15L,
-                    26L,
-                    LocalDate.now(),
-                    LocalDate.now().plusDays(7),
-                    ReservationStatus.PENDING
             )
     );
 
