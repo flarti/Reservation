@@ -3,40 +3,19 @@ package com.flarti.reserv;
 
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class ReservService {
 
-    private final Map<Long, Reservation> reservationMap = Map.of(
-            1L, new Reservation(
-                    1L,
-                    100L,
-                    20L,
-                    LocalDate.now(),
-                    LocalDate.now().plusDays(5),
-                    ReservationStatus.APPROVED
-            ),
+    private final Map<Long, Reservation> reservationMap;
+    private final AtomicLong idCounter;
 
-            2L, new Reservation(
-                    2L,
-                    12L,
-                    24L,
-                    LocalDate.now(),
-                    LocalDate.now().plusDays(5),
-                    ReservationStatus.APPROVED
-            ),
-
-            3L, new Reservation(
-                    3L,
-                    15L,
-                    27L,
-                    LocalDate.now(),
-                    LocalDate.now().plusDays(5),
-                    ReservationStatus.APPROVED
-            )
-    );
+    public ReservService() {
+        reservationMap = new HashMap<>();
+        idCounter = new AtomicLong();
+    }
 
     public Reservation getReservById(Long id) {
         if (!reservationMap.containsKey(id)) {
@@ -48,5 +27,24 @@ public class ReservService {
 
     public List<Reservation> findAllReservation() {
         return reservationMap.values().stream().toList();
+    }
+
+    public Reservation createReserv(Reservation reservationToCreate) {
+
+        if (reservationToCreate.id() != null) throw new IllegalArgumentException("Id should be empty");
+
+        if(reservationToCreate.status() != null) throw new IllegalArgumentException("Status should be empty");
+
+        var newReservation = new Reservation(
+                idCounter.incrementAndGet(),
+                reservationToCreate.userId(),
+                reservationToCreate.roomId(),
+                reservationToCreate.startDate(),
+                reservationToCreate.endDate(),
+                ReservationStatus.PENDING
+        );
+
+        reservationMap.put(newReservation.id(), newReservation);
+        return newReservation;
     }
 }
