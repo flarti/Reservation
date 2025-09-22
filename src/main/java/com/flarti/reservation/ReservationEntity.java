@@ -14,12 +14,17 @@ public class ReservationEntity {
 
     @Column(name = "user_id")
     private Long userId;
+
     @Column(name = "room_id")
     private Long roomId;
+
     @Column(name = "start_date")
     private LocalDate startDate;
+
     @Column(name = "end_date")
     private LocalDate endDate;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "status")
     private ReservationStatus status;
 
