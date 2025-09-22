@@ -1,4 +1,4 @@
-package com.flarti.reserv;
+package com.flarti.reservation;
 
 
 import org.springframework.stereotype.Service;
@@ -7,17 +7,20 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
-public class ReservService {
+public class ReservationService {
 
     private final Map<Long, Reservation> reservationMap;
     private final AtomicLong idCounter;
 
-    public ReservService() {
+    private final ReservationRepository reservationRepository;
+
+    public ReservationService(ReservationRepository reservationRepository) {
+        this.reservationRepository = reservationRepository;
         reservationMap = new HashMap<>();
         idCounter = new AtomicLong();
     }
 
-    public Reservation getReservById(Long id) {
+    public Reservation getReservationById(Long id) {
         if (!reservationMap.containsKey(id)) {
             throw new NoSuchElementException("Not found reservation By Id = " + id);
         }
@@ -26,10 +29,23 @@ public class ReservService {
     }
 
     public List<Reservation> findAllReservation() {
-        return reservationMap.values().stream().toList();
+        List<ReservationEntity> allEntities = reservationRepository.findAll();
+
+
+        return allEntities.stream()
+                .map(it ->
+                    new Reservation(
+                            it.getId(),
+                            it.getUserId(),
+                            it.getRoomId(),
+                            it.getStartDate(),
+                            it.getEndDate(),
+                            it.getStatus()
+                    )
+                ).toList();
     }
 
-    public Reservation createReserv(Reservation reservationToCreate) {
+    public Reservation createReservation(Reservation reservationToCreate) {
 
         if (reservationToCreate.id() != null) throw new IllegalArgumentException("Id should be empty");
 
@@ -48,7 +64,7 @@ public class ReservService {
         return newReservation;
     }
 
-    public Reservation updeteReserv(
+    public Reservation updeteReservation(
             Long id,
             Reservation reservationToUpdate
     ) {
@@ -74,20 +90,20 @@ public class ReservService {
         return updatedReservation;
     }
 
-    public void deleteReserv(Long id) {
+    public void deleteReservation(Long id) {
         if (!reservationMap.containsKey(id)) throw new NoSuchElementException("Not found By Id = " + id);
 
         reservationMap.remove(id);
     }
 
-    public Reservation approveReserv(Long id) {
+    public Reservation approveReservation(Long id) {
         if (!reservationMap.containsKey(id)) throw new NoSuchElementException("Not found By Id = " + id);
 
         var reservation = reservationMap.get(id);
         if (reservation.status() != ReservationStatus.PENDING) {
             throw new IllegalArgumentException("Cannot approve reservation: status=" + reservation.status());
         }
-        var isConflict = idReservConflict(reservation);
+        var isConflict = idReservationConflict(reservation);
         if (isConflict) throw new IllegalArgumentException("Cannot approve reservation");
 
         var approvedReservation = new Reservation(
@@ -103,7 +119,7 @@ public class ReservService {
         return approvedReservation;
     }
 
-    private boolean idReservConflict(
+    private boolean idReservationConflict(
             Reservation reservation
     ) {
 
