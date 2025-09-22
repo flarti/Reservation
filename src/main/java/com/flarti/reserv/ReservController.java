@@ -22,9 +22,16 @@ public class ReservController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Reservation> getReservById(@PathVariable("id") Long id) {
-        log.info("Called getReservById id=" + id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(reservService.getReservById(id));
+        log.info("Called getReservById id={}", id);
+
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(reservService.getReservById(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
+
     }
 
     @GetMapping()
@@ -38,7 +45,34 @@ public class ReservController {
             @RequestBody Reservation reservationToCreate
     ) {
         log.info("Called createReserv");
-        return ResponseEntity.status(201)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(reservService.createReserv(reservationToCreate));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Reservation> updateReserv(
+            @PathVariable("id") Long id,
+            @RequestBody Reservation reservationToUpdate
+    ) {
+        log.info("Called updateReserv id={} reservationToUpdate={}", id, reservationToUpdate);
+
+        var updated = reservService.updeteReserv(id, reservationToUpdate);
+
+        return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteReserv(
+            @PathVariable("id") Long id
+    ) {
+        log.info("Called deleteReserv id={}", id);
+
+        try {
+            reservService.deleteReserv(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .build();
+        }
     }
 }

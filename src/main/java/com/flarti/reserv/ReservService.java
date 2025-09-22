@@ -47,4 +47,17 @@ public class ReservService {
         reservationMap.put(newReservation.id(), newReservation);
         return newReservation;
     }
+
+    public Reservation updeteReserv(
+            Long id,
+            Reservation reservationToUpdate
+    ) {
+        return null;
+    }
+
+    public void deleteReserv(Long id) {
+        if (!reservationMap.containsKey(id)) throw new NoSuchElementException("Not found By Id = " + id);
+
+        reservationMap.remove(id);
+    }
 }
