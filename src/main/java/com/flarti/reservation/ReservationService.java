@@ -2,11 +2,17 @@ package com.flarti.reservation;
 
 
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import java.util.*;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ReservationService {
+
+    final Logger logger = LoggerFactory.getLogger(ReservationService.class);
 
     private final ReservationRepository reservationRepository;
 
@@ -73,10 +79,13 @@ public class ReservationService {
         return toDomainReservation(reservationRepository.save(updatedReservation));
     }
 
-    public void deleteReservation(Long id) {
+    @Transactional
+    public void cancelReservation(Long id) {
         if (!reservationRepository.existsById(id)) throw new EntityNotFoundException("Reservation not found for id " + id);
 
-        reservationRepository.deleteById(id);
+        reservationRepository.setStatus(id, ReservationStatus.CANCELLED);
+
+        logger.info("Successfully cancelled reservation: id={}", id);
     }
 
     public Reservation approveReservation(Long id) {
