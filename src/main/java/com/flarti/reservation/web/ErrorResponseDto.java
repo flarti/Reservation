@@ -1,4 +1,4 @@
-package com.flarti.reservation;
+package com.flarti.reservation.web;
 
 import java.time.LocalDateTime;
 

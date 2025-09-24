@@ -1,4 +1,4 @@
-package com.flarti.reservation;
+package com.flarti.reservation.reservations;
 
 import jakarta.persistence.*;
 
